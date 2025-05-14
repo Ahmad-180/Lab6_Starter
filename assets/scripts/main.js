@@ -1,16 +1,15 @@
-// main.js
+/***** main.js *****/
 
-// Run the init() function when the page has loaded
-window.addEventListener("DOMContentLoaded", init);
+window.addEventListener('DOMContentLoaded', init);
 
 // Starts the program, all function calls trace back here
 function init() {
-	// Get the recipes from localStorage
-	let recipes = getRecipesFromStorage();
-	// Add each recipe to the <main> element
-	addRecipesToDocument(recipes);
-	// Add the event listeners to the form elements
-	initFormHandler();
+  // Get the recipes from localStorage
+  let recipes = getRecipesFromStorage();
+  // Add each recipe to the <main> element
+  addRecipesToDocument(recipes);
+  // Add the event listeners to the form elements
+  initFormHandler();
 }
 
 /**
@@ -21,9 +20,8 @@ function init() {
  * @returns {Array<Object>} An array of recipes found in localStorage
  */
 function getRecipesFromStorage() {
-	// A9. TODO - Complete the functionality as described in this function
-	//           header. It is possible in only a single line, but should
-	//           be no more than a few lines.
+  /* ---------- A9 ---------- */
+  return JSON.parse(localStorage.getItem('recipes')) || [];
 }
 
 /**
@@ -34,11 +32,15 @@ function getRecipesFromStorage() {
  * @param {Array<Object>} recipes An array of recipes
  */
 function addRecipesToDocument(recipes) {
-	// A10. TODO - Get a reference to the <main> element
-	// A11. TODO - Loop through each of the recipes in the passed in array,
-	//            create a <recipe-card> element for each one, and populate
-	//            each <recipe-card> with that recipe data using element.data = ...
-	//            Append each element to <main>
+  /* ---------- A10 ---------- */
+  const main = document.querySelector('main');
+
+  /* ---------- A11 ---------- */
+  recipes.forEach(data => {
+    const card = document.createElement('recipe-card');
+    card.data = data;
+    main.appendChild(card);
+  });
 }
 
 /**
@@ -47,10 +49,8 @@ function addRecipesToDocument(recipes) {
  * @param {Array<Object>} recipes An array of recipes
  */
 function saveRecipesToStorage(recipes) {
-	// EXPLORE - START (All explore numbers start with B)
-	// B1. TODO - Complete the functionality as described in this function
-	//            header. It is possible in only a single line, but should
-	//            be no more than a few lines.
+  /* ---------- B1 ---------- */
+  localStorage.setItem('recipes', JSON.stringify(recipes));
 }
 
 /**
@@ -58,22 +58,49 @@ function saveRecipesToStorage(recipes) {
  * <button>.
  */
 function initFormHandler() {
-	// B2. TODO - Get a reference to the <form> element
-	// B3. TODO - Add an event listener for the 'submit' event, which fires when the
-	//            submit button is clicked
-	// Steps B4-B9 will occur inside the event listener from step B3
-	// B4. TODO - Create a new FormData object from the <form> element reference above
-	// B5. TODO - Create an empty object (we'll refer to this object as recipeObject to
-	//            make this easier to read), and then extract the keys and corresponding
-	//            values from the FormData object and insert them into recipeObject
-	// B6. TODO - Create a new <recipe-card> element
-	// B7. TODO - Add the recipeObject data to <recipe-card> using element.data
-	// B8. TODO - Append this new <recipe-card> to <main>
-	// B9. TODO - Get the recipes array from localStorage, add this new recipe to it, and
-	//            then save the recipes array back to localStorage
-	// B10. TODO - Get a reference to the "Clear Local Storage" button
-	// B11. TODO - Add a click event listener to clear local storage button
-	// Steps B12 & B13 will occur inside the event listener from step B11
-	// B12. TODO - Clear the local storage
-	// B13. TODO - Delete the contents of <main>
+  /* ---------- B2 ---------- */
+  const form = document.querySelector('form');
+  /* ---------- B3 ---------- */
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    /* ---------- B4 ---------- */
+    const formData = new FormData(form);
+    /* ---------- B5 ---------- */
+    const recipeObject = {};
+    formData.forEach((value, key) => recipeObject[key] = value);
+    // split ingredients string into array
+    if (recipeObject.ingredients)
+      recipeObject.ingredients = recipeObject.ingredients
+        .split(',')
+        .map(s => s.trim());
+
+    /* ---------- B6 ---------- */
+    const card = document.createElement('recipe-card');
+    /* ---------- B7 ---------- */
+    card.data = recipeObject;
+    /* ---------- B8 ---------- */
+    document.querySelector('main').appendChild(card);
+
+    /* ---------- B9 ---------- */
+    const recipes = getRecipesFromStorage();
+    /* ---------- B10 ---------- */
+    recipes.push(recipeObject);
+    /* ---------- B11 ---------- */
+    saveRecipesToStorage(recipes);
+
+    form.reset();           // UX nicety
+  });
+
+  /* ---------- B12 ---------- */
+  const clearBtn = document.getElementById('clear-storage');
+  clearBtn.addEventListener('click', () => {
+  	localStorage.clear();
+  	document.querySelector('main').innerHTML = '';
+});
+  /* ---------- B13 ---------- */
+  clearBtn.addEventListener('click', () => {
+    localStorage.clear();
+    document.querySelector('main').innerHTML = '';
+  });
 }
